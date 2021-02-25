@@ -40,5 +40,4 @@ This project is licensed under the terms of the [MIT License](/LICENSE.md)
 
 Please [cite this project as described here](/CITATION.md).
 
-Check Github connection. 
-
+Second comment. 
