@@ -1,0 +1,37 @@
+ \documentclass[11pt]{article}
+\author{Nicolas L. Ziebarth \thanks{Mailing Address: Department of Economics, Tippie College of Business,  University of Iowa, W344 Pappajohn Business Building, 21 E. Market St, Iowa City, IA 52245. E-mail address: nicolas.lehmannziebarth@gmail.com. }}
+\title{Readme for replicating results in ``Identifying the effects of bank failures from a natural experiment in Mississippi during the 
+Great Depression"}
+\usepackage{amsmath}
+ \newcommand{\reals}{\mathbb{R}}
+ \newcommand{\argmin}{\mathop{\mbox{ argmin }}}
+ \newcommand{\argmax}{\mathop{\mbox{ argmax }}}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{chicago}
+\usepackage{natbib}
+\usepackage{setspace}
+\usepackage{rotating}
+\usepackage{graphicx}
+\usepackage{verbatim}
+ \newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\E}{\mbox{E}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.75em width0.5em depth0.25em\fi}
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}{Proposition}[section]
+
+\begin{document}
+\maketitle
+
+The data files included are MS\_data\_all\_years\_regs.dta and MS\_data\_all\_years\_regs\_timber.dta. The only difference between the two is the fact that the latter includes the data for the timber industry. These Stata files are constructed from raw datasets keyed in by an outsourcing firm, which, in turn, is derived from the original schedules photographed from the National Archives. The raw input files and the Stata code to clean those files is availabe upon request. If you have particular questions about particular schedules, I can also provide access to the original images. You will see that the dataset provided includes many more variables than the set considered in this paper. Use those with caution as they have most likely been not cleaned. Please contact me if you have particular questions about those variables.
+
+The main Stata code is MS\_initial\_regs.do. It should be fairly self-explanatory. To execute it, simply change the path at the beginning of the file. Besides that, I use one installed Stata package (estout) to output the results. While the code will not execute if this package is not installed, it is immaterial to the results and the relevant lines can be commented out. This code reproduces all of the results and tables in the main body of the paper. I have attempted to add commments by the lines that create particular tables. The other Stata code MS\_initial\_regs\_timber and MS\_other\_tail\_trimming reproduce some of the results in the Online Appendix (the entry-exit results from the Online Appendix are reproduced in MS\_initial\_regs). The former recreates the results including timber and the other includes those for the tail trimming robustness checks.
+
+\end{document}

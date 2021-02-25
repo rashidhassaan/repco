@@ -1,0 +1,48 @@
+---
+title: "DSL Project"
+author: "Hassaan Rashid"
+date: "20/02/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r }
+library(foreign)
+library(ggplot2)
+library(car)
+library(tidyverse)
+data <- MS_data_all_years_regs
+timber <- MS_data_all_years_regs_timber
+Data$st_louis_fed
+Data$num_products
+```
+
+Data Cleaning
+```{r}
+Data_2 <- Data %>% filter(total_output_value < 5000) 
+
+```
+
+## Including Plots
+```{r}
+Data$fed_area <- ifelse(Data$st_louis_fed == 1, c("St_Louis"), c("Atlanta"))
+
+```
+
+You can also embed plots, for example:
+
+```{r}
+coplot(log_total_output_value ~ censusyear | fed_area, type = "l", data = Data)
+scatterplot(log_total_output_value ~ censusyear | fed_area, smooth = T, reg.lines = F, data = Data)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

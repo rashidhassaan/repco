@@ -1,0 +1,167 @@
+---
+title: "DSL (Vinh's version)"
+author: "Hassaan Rashid"
+date: "23/02/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Preparation 
+
+Load necessary packages 
+```{r}
+library(tidyverse)  # for
+library(magrittr)   # for 
+library(plm)        # 
+library(statar)     #
+library(haven)      #
+library(sandwich)   # 
+library(car)
+library(ggplot2)
+library(lintr) 
+```
+
+Load in the dataset
+```{r}
+data <- read_dta("data"/"MS_data_all_years_regs.dta")
+```
+```{r}
+lint("Desktop/Workshop/src/DSL (Vinh's version).Rmd")
+
+```
+
+New variables
+```{r}
+data$fed_area <- ifelse(data$st_louis_fed == 1, c("St_Louis"), c("Atlanta"))
+```
+
+## Visualization
+```{r}
+
+plot_1 <- ggplot(data = subset(data, !is.na(fed_area)), 
+                 aes(x = censusyear, y = log_total_output_value, color = as.factor(fed_area))) + 
+  theme_classic() + 
+  geom_vline(xintercept = 1931, linetype="dashed", color = "blue") + 
+  stat_summary(fun = "mean", geom = "line", aes(group = factor(fed_area)), na.rm = T)
+plot_1
+
+plot_2 <- ggplot(data = subset(data, num_products == 1 & !is.na(fed_area)), 
+                 aes(x = censusyear, y = log_output_quantity_1, color = as.factor(fed_area))) + 
+  theme_classic() + 
+  geom_vline(xintercept = 1931, linetype="dashed", color = "blue") + 
+  stat_summary(fun = "mean", geom = "line", aes(group = factor(fed_area)), na.rm = T)
+plot_2
+
+plot_3 <- ggplot(data = subset(data, num_products == 1 & !is.na(fed_area)), 
+                 aes(x = censusyear, y = log_output_price_1, color = as.factor(fed_area))) + 
+  geom_point(na.rm = T) + 
+  theme_classic() + 
+  geom_vline(xintercept = 1931, linetype="dashed", color = "blue") + 
+  stat_summary(fun = "mean", geom = "line", aes(group = factor(fed_area)), na.rm = T)
+plot_3
+
+plot_4 <- ggplot(data = subset(data, !is.na(fed_area)), 
+                 aes(x = censusyear, y = log_wage_earners_total, color = as.factor(fed_area))) + 
+  geom_point(na.rm = T) + 
+  theme_classic() + 
+  geom_vline(xintercept = 1931, linetype="dashed", color = "blue") + 
+  stat_summary(fun = "mean", geom = "line", aes(group = factor(fed_area)), na.rm = T)
+plot_4
+
+plot_5 <- ggplot(data = subset(data, !is.na(fed_area)), 
+                 aes(x = censusyear, y = log_average_wage_a, color = as.factor(fed_area))) + 
+  geom_point(na.rm = T) + 
+  theme_classic() + 
+  geom_vline(xintercept = 1931, linetype="dashed", color = "blue") + 
+  stat_summary(fun = "mean", geom = "line", aes(group = factor(fed_area)), na.rm = T)
+plot_5
+
+plot_6 <- ggplot(data = subset(data, !is.na(fed_area)), 
+                 aes(x = censusyear, y = log_hours_per_wage_earner, color = as.factor(fed_area))) + 
+  theme_classic() + 
+  geom_vline(xintercept = 1931, linetype="dashed", color = "blue") + 
+  stat_summary(fun = "mean", geom = "line", aes(group = factor(fed_area)), na.rm = T)
+plot_6
+
+```
+
+## Description 
+
+# Data Analysis 
+## Table 1 - 4 (Vinh)
+### Table 1
+```{r}
+data %>% 
+  filter(censusyear == 1929) %$%
+  t.test(log_total_output_value ~ st_louis_fed, alternative = "two.sided")
+
+data %>% 
+  filter(censusyear == 1929 & num_products == 1) %$%
+  t.test(log_output_quantity_1 ~ st_louis_fed, alternative = "two.sided")
+
+data %>% 
+  filter(censusyear == 1929 & num_products == 1) %$%
+  t.test(log_output_price_1 ~ st_louis_fed, alternative = "two.sided")
+
+data %>% 
+  filter(censusyear == 1929) %$%
+  t.test(log_wage_earners_total ~ st_louis_fed, alternative = "two.sided")
+
+data %>% 
+  filter(censusyear == 1929) %$%
+  t.test(log_average_wage_a ~ st_louis_fed, alternative = "two.sided")
+
+data %>% 
+  filter(censusyear == 1929) %$%
+  t.test(log_hours_per_wage_earner ~ st_louis_fed, alternative = "two.sided")
+```
+
+
+### Table 2
+```{r}
+data_2 <- subset(data, total_output_value >= 5000)
+
+data_2 <- data_2 %>% 
+  mutate(p_wage = 0)
+
+
+# create the percentile of average_wage_a for each year and in each industry.
+# year <- unique(data_2$censusyear)
+# industry <- unique(data_2$industrycode)
+# 
+# 
+# work in (very little) progress
+# wage <- data.frame()
+# for (i in industry) {
+#   for (j in year) {
+#     for (k in nrow(data_2))
+#       if (data_2$censusyear[k] == j & data_2$industrycode == i)
+#       data_2$p_wage[k] <- data_2 %>%
+#               filter(censusyear == j & industrycode == i) %$%
+#               xtile(average_wage_a, 100)
+#     }
+# }
+
+# since getting p_wage is for now not important at all, I will try to just go ahead and skip the above part 
+
+# The section below is only the "core" codes. Ideally, it would be nice to have a loop like in the original stata code. 
+
+# Filter data for only year 1929 and 1931 
+filtered <-  data_2 %>% 
+  filter(censusyear == 1929 | censusyear == 1931)
+
+# Convert year_1931 and industrycode into factors to automatically create dummies in regression 
+data_2$year_1931 <- as.factor(data_2$year_1931)
+data_2$industrycode <- as.factor(data_2$industrycode)
+
+# Table 2 - first column 
+within <- plm(log_total_output_value ~ st_louis_fed_1931 + year_1931*industrycode, 
+    data = filtered,
+    model = "within", 
+    effect = "individual", 
+    index = c("firmid", "year_1931"))
+coeftest(within, vcov = vcovHC(within))
+```
